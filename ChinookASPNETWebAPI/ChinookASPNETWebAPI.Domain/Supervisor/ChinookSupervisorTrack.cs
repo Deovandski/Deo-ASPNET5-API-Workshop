@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
+using FluentValidation;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -65,6 +65,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<TrackApiModel> AddTrack(TrackApiModel newTrackApiModel)
         {
+            await _trackValidator.ValidateAndThrowAsync(newTrackApiModel);
+
             var track = newTrackApiModel.Convert();
 
             await _trackRepository.Add(track);
@@ -74,6 +76,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<bool> UpdateTrack(TrackApiModel trackApiModel)
         {
+            await _trackValidator.ValidateAndThrowAsync(trackApiModel);
+
             var track = await _trackRepository.GetById(trackApiModel.Id);
 
             if (track == null) return false;

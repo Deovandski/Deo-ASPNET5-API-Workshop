@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
+using FluentValidation;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -40,6 +40,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<CustomerApiModel> AddCustomer(CustomerApiModel newCustomerApiModel)
         {
+            await _customerValidator.ValidateAndThrowAsync(newCustomerApiModel);
+
             var customer = newCustomerApiModel.Convert();
 
             customer = await _customerRepository.Add(customer);
@@ -49,6 +51,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<bool> UpdateCustomer(CustomerApiModel customerApiModel)
         {
+            await _customerValidator.ValidateAndThrowAsync(customerApiModel);
+
             var customer = await _customerRepository.GetById(customerApiModel.Id);
 
             if (customer == null) return false;

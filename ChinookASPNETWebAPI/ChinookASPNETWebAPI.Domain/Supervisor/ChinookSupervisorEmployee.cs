@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
+using FluentValidation;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -34,6 +34,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<EmployeeApiModel> AddEmployee(EmployeeApiModel newEmployeeApiModel)
         {
+            await _employeeValidator.ValidateAndThrowAsync(newEmployeeApiModel);
+
             var employee = newEmployeeApiModel.Convert();
 
             employee = await _employeeRepository.Add(employee);
@@ -43,6 +45,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<bool> UpdateEmployee(EmployeeApiModel employeeApiModel)
         {
+            await _employeeValidator.ValidateAndThrowAsync(employeeApiModel);
+
             var employee = await _employeeRepository.GetById(employeeApiModel.Id);
 
             if (employee == null) return false;

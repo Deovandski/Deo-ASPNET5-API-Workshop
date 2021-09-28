@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
+using FluentValidation;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -30,6 +30,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<MediaTypeApiModel> AddMediaType(MediaTypeApiModel newMediaTypeApiModel)
         {
+            await _mediaTypeValidator.ValidateAndThrowAsync(newMediaTypeApiModel);
+
             var mediaType = newMediaTypeApiModel.Convert();
 
             mediaType = await _mediaTypeRepository.Add(mediaType);
@@ -39,6 +41,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<bool> UpdateMediaType(MediaTypeApiModel mediaTypeApiModel)
         {
+            await _mediaTypeValidator.ValidateAndThrowAsync(mediaTypeApiModel);
+
             var mediaType = await _mediaTypeRepository.GetById(mediaTypeApiModel.Id);
 
             if (mediaType == null) return false;

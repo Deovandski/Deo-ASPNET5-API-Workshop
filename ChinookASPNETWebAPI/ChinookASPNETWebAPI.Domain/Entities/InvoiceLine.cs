@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using ChinookASPNETWebAPI.Domain.ApiModels;
+﻿using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Converters;
 
 namespace ChinookASPNETWebAPI.Domain.Entities

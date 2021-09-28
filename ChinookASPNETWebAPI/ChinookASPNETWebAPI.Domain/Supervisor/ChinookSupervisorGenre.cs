@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
+using FluentValidation;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -30,6 +30,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<GenreApiModel> AddGenre(GenreApiModel newGenreApiModel)
         {
+            await _genreValidator.ValidateAndThrowAsync(newGenreApiModel);
+
             var genre = newGenreApiModel.Convert();
 
             genre = await _genreRepository.Add(genre);
@@ -39,6 +41,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<bool> UpdateGenre(GenreApiModel genreApiModel)
         {
+            await _genreValidator.ValidateAndThrowAsync(genreApiModel);
+
             var genre = await _genreRepository.GetById(genreApiModel.Id);
 
             if (genre == null) return false;

@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
+using FluentValidation;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -29,6 +29,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<PlaylistApiModel> AddPlaylist(PlaylistApiModel newPlaylistApiModel)
         {
+            await _playlistValidator.ValidateAndThrowAsync(newPlaylistApiModel);
+
             var playlist = newPlaylistApiModel.Convert();
 
             playlist = await _playlistRepository.Add(playlist);
@@ -38,6 +40,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<bool> UpdatePlaylist(PlaylistApiModel playlistApiModel)
         {
+            await _playlistValidator.ValidateAndThrowAsync(playlistApiModel);
+
             var playlist = await _playlistRepository.GetById(playlistApiModel.Id);
 
             if (playlist == null) return false;

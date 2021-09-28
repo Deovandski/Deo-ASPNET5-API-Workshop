@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
+using FluentValidation;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -42,6 +42,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<InvoiceLineApiModel> AddInvoiceLine(InvoiceLineApiModel newInvoiceLineApiModel)
         {
+            await _invoiceLineValidator.ValidateAndThrowAsync(newInvoiceLineApiModel);
+
             var invoiceLine = newInvoiceLineApiModel.Convert();
 
             invoiceLine = await _invoiceLineRepository.Add(invoiceLine);
@@ -51,6 +53,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<bool> UpdateInvoiceLine(InvoiceLineApiModel invoiceLineApiModel)
         {
+            await _invoiceLineValidator.ValidateAndThrowAsync(invoiceLineApiModel);
+
             var invoiceLine = await _invoiceLineRepository.GetById(invoiceLineApiModel.InvoiceId);
 
             if (invoiceLine == null) return false;

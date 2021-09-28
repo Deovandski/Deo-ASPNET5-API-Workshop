@@ -1,4 +1,6 @@
-﻿using ChinookASPNETWebAPI.Domain.Repositories;
+﻿using ChinookASPNETWebAPI.Domain.ApiModels;
+using ChinookASPNETWebAPI.Domain.Repositories;
+using FluentValidation;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -15,6 +17,17 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
         private readonly IPlaylistRepository _playlistRepository;
         private readonly ITrackRepository _trackRepository;
 
+        private readonly IValidator<AlbumApiModel> _albumValidator;
+        private readonly IValidator<ArtistApiModel> _artistValidator;
+        private readonly IValidator<CustomerApiModel> _customerValidator;
+        private readonly IValidator<EmployeeApiModel> _employeeValidator;
+        private readonly IValidator<GenreApiModel> _genreValidator;
+        private readonly IValidator<InvoiceApiModel> _invoiceValidator;
+        private readonly IValidator<InvoiceLineApiModel> _invoiceLineValidator;
+        private readonly IValidator<MediaTypeApiModel> _mediaTypeValidator;
+        private readonly IValidator<PlaylistApiModel> _playlistValidator;
+        private readonly IValidator<TrackApiModel> _trackValidator;
+
         public ChinookSupervisor(IAlbumRepository albumRepository,
             IArtistRepository artistRepository,
             ICustomerRepository customerRepository,
@@ -24,7 +37,17 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
             IInvoiceRepository invoiceRepository,
             IMediaTypeRepository mediaTypeRepository,
             IPlaylistRepository playlistRepository,
-            ITrackRepository trackRepository
+            ITrackRepository trackRepository,
+            IValidator<AlbumApiModel> albumValidator,
+            IValidator<ArtistApiModel> artistValidator,
+            IValidator<CustomerApiModel> customerValidator,
+            IValidator<EmployeeApiModel> employeeValidator,
+            IValidator<GenreApiModel> genreValidator,
+            IValidator<InvoiceApiModel> invoiceValidator,
+            IValidator<InvoiceLineApiModel> invoiceLineValidator,
+            IValidator<MediaTypeApiModel> mediaTypeValidator,
+            IValidator<PlaylistApiModel> playlistValidator,
+            IValidator<TrackApiModel> trackValidator
         )
         {
             _albumRepository = albumRepository;
@@ -37,6 +60,17 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
             _mediaTypeRepository = mediaTypeRepository;
             _playlistRepository = playlistRepository;
             _trackRepository = trackRepository;
+
+            _albumValidator = albumValidator;
+            _artistValidator = artistValidator;
+            _customerValidator = customerValidator;
+            _employeeValidator = employeeValidator;
+            _genreValidator = genreValidator;
+            _invoiceValidator = invoiceValidator;
+            _invoiceLineValidator = invoiceLineValidator;
+            _mediaTypeValidator = mediaTypeValidator;
+            _playlistValidator = playlistValidator;
+            _trackValidator = trackValidator;
         }
     }
 }

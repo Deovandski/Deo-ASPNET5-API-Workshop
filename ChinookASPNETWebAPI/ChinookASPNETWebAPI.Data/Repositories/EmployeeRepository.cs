@@ -23,7 +23,7 @@ namespace ChinookASPNETWebAPI.Data.Repositories
         public void Dispose() => _context.Dispose();
 
         public async Task<List<Employee>> GetAll() =>
-            await _context.Employees.AsNoTrackingWithIdentityResolution().ToListAsync();
+            await _context.Employees.ToListAsync();
 
         public async Task<Employee> GetById(int id) =>
             await _context.Employees.FindAsync(id);

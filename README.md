@@ -79,6 +79,14 @@ Caching Data vs Reliability. Not really an issue since we go full stateless
 
 Versioning.. To be discussed
 
+Really nice website.
+https://www.connectionstrings.com/
+
+See Produce/Consume. Preferable to set it on a Controller level for all HTTP Body Content.
+
+Manual "Automapper" is a thing, but AutoMapper is better.
+
+Partial Class --> See ChinookSupervisor
 
 ## Bad Habit Notes
 

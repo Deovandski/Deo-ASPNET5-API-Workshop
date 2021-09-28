@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
+using FluentValidation;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -30,6 +30,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<ArtistApiModel> AddArtist(ArtistApiModel newArtistApiModel)
         {
+            await _artistValidator.ValidateAndThrowAsync(newArtistApiModel);
+
             var artist = newArtistApiModel.Convert();
 
             artist = await _artistRepository.Add(artist);
@@ -39,6 +41,8 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
 
         public async Task<bool> UpdateArtist(ArtistApiModel artistApiModel)
         {
+            await _artistValidator.ValidateAndThrowAsync(artistApiModel);
+
             var artist = await _artistRepository.GetById(artistApiModel.Id);
 
             if (artist == null) return false;

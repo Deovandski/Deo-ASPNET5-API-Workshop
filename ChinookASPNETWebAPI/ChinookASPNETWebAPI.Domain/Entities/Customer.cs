@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Converters;
 
@@ -24,7 +23,7 @@ namespace ChinookASPNETWebAPI.Domain.Entities
         public string Phone { get; set; }
         public string Fax { get; set; }
         public string Email { get; set; }
-        public int? SupportRepId { get; set; }
+        public int SupportRepId { get; set; }
 
 
         public virtual Employee SupportRep { get; set; }
@@ -46,7 +45,7 @@ namespace ChinookASPNETWebAPI.Domain.Entities
                 Phone = Phone,
                 Fax = Fax,
                 Email = Email,
-                SupportRepId = SupportRepId ?? 0
+                SupportRepId = SupportRepId
             };
     }
 }
