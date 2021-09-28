@@ -32,4 +32,20 @@ Now go back to SMSS
 
 and follow the rest of the instructions using the bak file.
 
-I still have to see if I can connect through the ODBC... Might be a pain in the arse if I did not setup ODBC configs, if there are any to do.
+## Testing ODBC
+On VS, Open Server Explorer and add Server. Select Microsoft SQL Server.
+
+Server Name
+
+    (LocalDb)\MyInstance
+
+    
+Authentication
+
+    Windows Authentication
+
+Database Name
+
+    Chinook
+
+Now test connection. If it worked, then you good. Otherwise, you're SOL.
