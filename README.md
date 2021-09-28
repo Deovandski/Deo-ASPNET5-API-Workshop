@@ -57,9 +57,25 @@ Now test connection. If it worked, then you good. Otherwise, you're SOL.
 
 ## Notes
 
+HEAD HTTP Method
 
-NTier API Desiging.
+Insert POST resulting 201 which we do.
+DELETE as 204, no content.
+PUT do need to use 304 (Not modified) when update did not change anything.
 
-Caching Data
+NTier API Desiging. The name behind the .Domain, .Data, etc.
 
-Versioning
+Code On Demand... Metadata for callback links. The actual name for the process to return 201 on inserts.
+
+Caching Data vs Reliability. Not really an issue since we go full stateless
+
+Versioning.. To be discussed
+
+
+## Bad Habit Notes
+
+Calling Data Access from Controllers. Repositories fix that, so we should be good.
+
+Break up into projects of a solution. .API, .Domain, .Data, .Tests. .Shared does not seem standard, but rather a folder in the .Domain.
+
+Coupling Data Access to Domain... Again, Repositories fix that.
