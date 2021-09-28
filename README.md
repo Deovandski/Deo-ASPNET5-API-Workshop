@@ -75,7 +75,9 @@ NTier API Desiging. The name behind the .Domain, .Data, etc.
 
 Code On Demand... Metadata for callback links. The actual name for the process to return 201 on inserts.
 
-Caching Data vs Reliability. Not really an issue since we go full stateless
+Caching Data vs Reliability. Not really an issue since we go full stateless.
+
+
 
 Really nice website.
 https://www.connectionstrings.com/
@@ -90,7 +92,8 @@ Supervisor Concept. Insead of DI'ing repositories, we would have this layer abov
 
 Versioning.. To be discussed
 
-FluentValidation is not bad, but the built-in validation with decorators pattern (modelState validation) we use is more straight forward.
+FluentValidation is not bad, but the built-in validation with decorators pattern (modelState validation) we use is more straight forward. The excuse to avoid Decorators is because testing against them is difficult. I clearly remember seeing 400s because of bad mock data I was randomly generating through NUnit.
+ Note to Self -- Check if NUnit is giving metadata (test passed, etc) on the decorators themselves
 
 ## Bad Habit Notes
 
