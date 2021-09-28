@@ -61,7 +61,7 @@ Now right click the db on VS Server Explorer and run this SQL
     exec sp_addrolemember 'db_owner', 'Hue'
 
 
-This is the user C# is using to do do stuff...
+This is the user C# is using to do do stuff... Also ConfigureConnection has a nice modifier with RuntimeConfiguration to distinguish between Windows vs Linux. That helps some, but because we have to deal with the AS400, we will still need to play chair games between db2 vs db2-lnx nugets
 
 ## Notes
 
@@ -73,9 +73,13 @@ PUT do need to use 304 (Not modified) when update did not change anything.
 
 NTier API Desiging. The name behind the .Domain, .Data, etc.
 
+Why entities and interface are on Domain? Because it makes it easier to have multiple "Data" type projects such as DataEf/DataJson, etc. So no more .Services type of project.
+
 Code On Demand... Metadata for callback links. The actual name for the process to return 201 on inserts.
 
 Caching Data vs Reliability. Not really an issue since we go full stateless.
+https://woodruff.dev/aspnet-5-web-api-workshop/Standing%20Up%20an%20ASP.NET%20Core%20Web%20API/caching-data/
+
 
 
 
@@ -102,3 +106,11 @@ Calling Data Access from Controllers. Repositories fix that, so we should be goo
 Break up into projects of a solution. .API, .Domain, .Data, .Tests. .Shared does not seem standard, but rather a folder in the .Domain.
 
 Coupling Data Access to Domain... Again, Repositories fix that.
+
+
+## Additional Content
+
+Dapper is a thing. Had no idea.
+
+EF Core It is not good for a huge domain model. This means that Sales Reports Engine, and other thigns on the AS400 we have will be harder to deal with.
+https://entityframework.net/ef-vs-dapper
