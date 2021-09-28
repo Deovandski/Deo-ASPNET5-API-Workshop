@@ -77,8 +77,6 @@ Code On Demand... Metadata for callback links. The actual name for the process t
 
 Caching Data vs Reliability. Not really an issue since we go full stateless
 
-Versioning.. To be discussed
-
 Really nice website.
 https://www.connectionstrings.com/
 
@@ -87,6 +85,12 @@ See Produce/Consume. Preferable to set it on a Controller level for all HTTP Bod
 Manual "Automapper" is a thing, but AutoMapper is better.
 
 Partial Class --> See ChinookSupervisor
+
+Supervisor Concept. Insead of DI'ing repositories, we would have this layer above that is the main connective. He also used it due to the supervisor also holding the Validators. For my use case, since we use the decorators validation & modelState, we do not seem to need it.
+
+Versioning.. To be discussed
+
+FluentValidation is not bad, but the built-in validation with decorators pattern (modelState validation) we use is more straight forward.
 
 ## Bad Habit Notes
 
