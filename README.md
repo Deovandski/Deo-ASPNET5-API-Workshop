@@ -1,29 +1,35 @@
 # Deo-ASPNET5-API-Workshop
-Result from a workshop I attended.
 
-The guy who created the workshop instructions forgot the small fact that you need to spin up a SQL Server instance... Ops.
+## Info
+Result from a VS Live! 2021 workshop I attended regarding .NET 5 Api Course.
 
-Grab the express from here (which is the counterpart for the SMSS)
+## SQL Server Notice
+
+The guy who created the workshop instructions forgot the small fact that you need to spin up a SQL Server instance... A small detail (not).
+
+Grab the SQL Server 2019 from here (which is the counterpart for the SMSS)
 
 https://www.microsoft.com/en-us/sql-server/sql-server-downloads
+**Make sure to select LOCAlDB Under feature selection, and that you are installing 2019**
 
-
-Then setup the Local Database Engine
+Then setup & start the Local Database Engine
 
 *You have to find where SqlLocalDb ended up.
 
-C:\Program Files\Microsoft SQL Server\130\Tools\Binn
+    C:\Program Files\Microsoft SQL Server\150\Tools\Binn
 
-*This is where I found mine. Now run:
+*You have to be at v150 as that is the version the bak file was created against. Now run:
 
-SqlLocalDb create "MyInstance"
-SqlLocalDb info "MyInstance"
-SqlLocalDb start "MyInstance"
+    SqlLocalDb create "MyInstance"
+    SqlLocalDb start "MyInstance"
+    SqlLocalDb info "MyInstance"
 
-https://www.mssqltips.com/sqlservertip/5612/getting-started-with-sql-server-2017-express-localdb/
+**Make sure it is running**
 
 Now go back to SMSS
 
 (localdb)\MyInstance is the serverName
 
-and follow the rest of the instructions
+and follow the rest of the instructions using the bak file.
+
+I still have to see if I can connect through the ODBC... Might be a pain in the arse if I did not setup ODBC configs, if there are any to do.
