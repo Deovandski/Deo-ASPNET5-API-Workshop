@@ -54,6 +54,14 @@ Database Name
 
 Now test connection. If it worked, then you good. Otherwise, you're SOL.
 
+Now right click the db on VS Server Explorer and run this SQL
+
+    CREATE LOGIN [Hue] WITH PASSWORD = 'topsecret';
+    CREATE USER [Hue] FOR LOGIN [Hue];
+    exec sp_addrolemember 'db_owner', 'Hue'
+
+
+This is the user C# is using to do do stuff...
 
 ## Notes
 

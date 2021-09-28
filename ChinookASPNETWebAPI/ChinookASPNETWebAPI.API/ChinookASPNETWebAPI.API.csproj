@@ -8,4 +8,9 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ChinookASPNETWebAPI.Data\ChinookASPNETWebAPI.Data.csproj" />
+    <ProjectReference Include="..\ChinookASPNETWebAPI.Domain\ChinookASPNETWebAPI.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
