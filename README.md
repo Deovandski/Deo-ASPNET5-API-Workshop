@@ -3,9 +3,13 @@
 ## Info
 Result from a VS Live! 2021 workshop I attended regarding .NET 5 Api Course.
 
+https://github.com/cwoodruff/aspnet-5-web-api-workshop
+
+https://woodruff.dev/aspnet-5-web-api-workshop/
+
 ## SQL Server Notice
 
-The guy who created the workshop instructions forgot the small fact that you need to spin up a SQL Server instance... A small detail (not).
+Setting up localdb
 
 Grab the SQL Server 2019 from here (which is the counterpart for the SMSS)
 
@@ -49,3 +53,13 @@ Database Name
     Chinook
 
 Now test connection. If it worked, then you good. Otherwise, you're SOL.
+
+
+## Notes
+
+
+NTier API Desiging.
+
+Caching Data
+
+Versioning
