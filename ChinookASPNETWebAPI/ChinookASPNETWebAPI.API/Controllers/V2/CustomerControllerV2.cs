@@ -12,9 +12,10 @@ using Microsoft.Extensions.Logging;
 
 namespace ChinookASPNETWebAPI.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     [EnableCors("CorsPolicy")]
+    [ApiVersion("2.0")]
     public class CustomerController : ControllerBase
     {
         private readonly IChinookSupervisor _chinookSupervisor;

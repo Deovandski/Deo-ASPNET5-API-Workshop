@@ -102,10 +102,10 @@ Partial Class --> See ChinookSupervisor
 
 Supervisor Concept. Insead of DI'ing repositories, we would have this layer above that is the main connective. He also used it due to the supervisor also holding the Validators. For my use case, since we use the decorators validation & modelState, we do not seem to need it.
 
-Versioning.. To be discussed
-
 FluentValidation is not bad, but the built-in validation with decorators pattern (modelState validation) we use is more straight forward. The excuse to avoid Decorators is because testing against them is difficult. I clearly remember seeing 400s because of bad mock data I was randomly generating through NUnit.
  Note to Self -- Check if NUnit is giving metadata (test passed, etc) on the decorators themselves
+
+Versioning.. Highly argumentative right now. No set standad if querystring, or url path... However! MvC.Versioning package is the way to go once we pick which way to set versioning. Does not work out of the box with swagger, but with some tweaks we can make it work. Example provided use pathing versioning.
 
 ## Bad Habit Notes
 

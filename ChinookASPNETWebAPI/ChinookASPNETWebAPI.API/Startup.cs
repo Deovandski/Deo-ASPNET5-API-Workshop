@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ChinookASPNETWebAPI.API.Configurations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChinookASPNETWebAPI.API
 {
@@ -29,6 +30,16 @@ namespace ChinookASPNETWebAPI.API
             services.AddHealthChecks();
             services.AddCaching(Configuration);
             services.AddIdentity(Configuration);
+            services.AddApiVersioning(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                //options.DefaultApiVersion = new ApiVersion( new DateTime( 2020, 9, 22 ) );
+                //options.DefaultApiVersion =
+                //  new ApiVersion(new DateTime( 2020, 9, 22 ), "LetoII", 1, "Beta");
+                options.ReportApiVersions = true;
+                //options.ApiVersionReader = new HeaderApiVersionReader("api-version");
+            });
             services.AddControllers();
 
         }
@@ -49,7 +60,6 @@ namespace ChinookASPNETWebAPI.API
 
             app.UseCors("CorsPolicy");
 
-            app.UseSwaggerUI(c =>
             app.UseResponseCaching();
 
             app.UseAuthorization();

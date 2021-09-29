@@ -112,5 +112,6 @@ namespace ChinookASPNETWebAPI.API.Configurations
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ChinookContext>();
         }
+
     }
 }
