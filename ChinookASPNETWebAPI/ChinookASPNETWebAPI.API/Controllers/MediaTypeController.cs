@@ -15,6 +15,7 @@ namespace ChinookASPNETWebAPI.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("CorsPolicy")]
+    [ResponseCache(Duration = 604800)]
     public class MediaTypeController : ControllerBase
     {
         private readonly IChinookSupervisor _chinookSupervisor;

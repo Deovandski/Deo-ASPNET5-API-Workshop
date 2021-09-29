@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -14,18 +16,40 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
         {
             List<Genre> customers = await _genreRepository.GetAll();
             var genreApiModels = customers.ConvertAll();
+
+            foreach (var genre in genreApiModels)
+            {
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Genre-", genre.Id), genre, (TimeSpan)cacheEntryOptions);
+            }
             
             return genreApiModels;
         }
 
         public async Task<GenreApiModel> GetGenreById(int id)
         {
-            var genre = await _genreRepository.GetById(id);
-            if (genre == null) return null;
-            var genreApiModel = genre.Convert();
-            genreApiModel.Tracks = (await GetTrackByGenreId(genreApiModel.Id)).ToList();
+            var genreApiModelCached = _cache.Get<GenreApiModel>(string.Concat("Genre-", id));
 
-            return genreApiModel;
+            if (genreApiModelCached != null)
+            {
+                return genreApiModelCached;
+            }
+            else
+            {
+                var genre = await _genreRepository.GetById(id);
+                if (genre == null) return null;
+                var genreApiModel = genre.Convert();
+                genreApiModel.Tracks = (await GetTrackByGenreId(genreApiModel.Id)).ToList();
+
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Genre-", genreApiModel.Id), genreApiModel, (TimeSpan)cacheEntryOptions);
+
+                return genreApiModel;
+            }
         }
 
         public async Task<GenreApiModel> AddGenre(GenreApiModel newGenreApiModel)

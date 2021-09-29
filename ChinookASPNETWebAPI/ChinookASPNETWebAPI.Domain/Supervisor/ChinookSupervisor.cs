@@ -1,6 +1,8 @@
 ﻿using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Repositories;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -28,6 +30,10 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
         private readonly IValidator<PlaylistApiModel> _playlistValidator;
         private readonly IValidator<TrackApiModel> _trackValidator;
 
+        private readonly IMemoryCache _cache;
+
+        private readonly IDistributedCache _distributedCache;
+
         public ChinookSupervisor(IAlbumRepository albumRepository,
             IArtistRepository artistRepository,
             ICustomerRepository customerRepository,
@@ -47,7 +53,9 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
             IValidator<InvoiceLineApiModel> invoiceLineValidator,
             IValidator<MediaTypeApiModel> mediaTypeValidator,
             IValidator<PlaylistApiModel> playlistValidator,
-            IValidator<TrackApiModel> trackValidator
+            IValidator<TrackApiModel> trackValidator,
+            IMemoryCache memoryCache,
+            IDistributedCache distributedCache
         )
         {
             _albumRepository = albumRepository;
@@ -71,6 +79,9 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
             _mediaTypeValidator = mediaTypeValidator;
             _playlistValidator = playlistValidator;
             _trackValidator = trackValidator;
+
+            _cache = memoryCache;
+            _distributedCache = distributedCache;
         }
     }
 }

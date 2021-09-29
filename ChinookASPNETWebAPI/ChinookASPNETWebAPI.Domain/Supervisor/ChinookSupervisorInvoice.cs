@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -14,22 +16,46 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
         {
             List<Invoice> invoices = await _invoiceRepository.GetAll();
             var invoiceApiModels = invoices.ConvertAll();
+
+            foreach (var invoice in invoiceApiModels)
+            {
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Invoice-", invoice.Id), invoice, (TimeSpan)cacheEntryOptions);
+            }
+
             return invoiceApiModels;
         }
 
         public async Task<InvoiceApiModel> GetInvoiceById(int id)
         {
-            var invoice = await _invoiceRepository.GetById(id);
-            if (invoice == null) return null;
-            var invoiceApiModel = invoice.Convert();
-            invoiceApiModel.InvoiceLines = (await GetInvoiceLineByInvoiceId(invoiceApiModel.Id)).ToList();
+            var invoiceApiModelCached = _cache.Get<InvoiceApiModel>(string.Concat("Invoice-", id));
 
-            return invoiceApiModel;
+            if (invoiceApiModelCached != null)
+            {
+                return invoiceApiModelCached;
+            }
+            else
+            {
+                var invoice = await _invoiceRepository.GetById(id);
+                if (invoice == null) return null;
+                var invoiceApiModel = invoice.Convert();
+                invoiceApiModel.InvoiceLines = (await GetInvoiceLineByInvoiceId(invoiceApiModel.Id)).ToList();
+
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Invoice-", invoiceApiModel.Id), invoiceApiModel, (TimeSpan)cacheEntryOptions);
+
+                return invoiceApiModel;
+            }
         }
 
         public async Task<IEnumerable<InvoiceApiModel>> GetInvoiceByCustomerId(int id)
         {
             var invoices = await _invoiceRepository.GetByCustomerId(id);
+
             return invoices.ConvertAll();
         }
 

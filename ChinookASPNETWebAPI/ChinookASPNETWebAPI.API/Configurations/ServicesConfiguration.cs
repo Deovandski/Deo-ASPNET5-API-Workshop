@@ -1,12 +1,19 @@
-﻿using ChinookASPNETWebAPI.Data.Repositories;
+﻿using System.Text;
+using ChinookASPNETWebAPI.Data.Repositories;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Repositories;
 using ChinookASPNETWebAPI.Domain.Supervisor;
 using ChinookASPNETWebAPI.Domain.Validation;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using ChinookASPNETWebAPI.Data.Data;
+using ChinookASPNETWebAPI.Domain.Identity;
 
 namespace ChinookASPNETWebAPI.API.Configurations
 {
@@ -63,6 +70,47 @@ namespace ChinookASPNETWebAPI.API.Configurations
                         .AllowAnyMethod()
                         .AllowAnyHeader());
             });
+        }
+
+        public static void AddCaching(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.AddResponseCaching();
+            services.AddMemoryCache();
+            services.AddDistributedSqlServerCache(options =>
+            {
+                options.ConnectionString = configuration.GetConnectionString("ChinookSQLCache");
+                options.SchemaName = "dbo";
+                options.TableName = "ChinookCache";
+            });
+        }
+
+        public static void AddIdentity(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.Configure<JwtConfig>(configuration.GetSection("JwtConfig"));
+
+            services.AddAuthentication(options => {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(jwt => {
+                    var key = Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]);
+
+                    jwt.SaveToken = true;
+                    jwt.TokenValidationParameters = new TokenValidationParameters{
+                        ValidateIssuerSigningKey= true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false, 
+                        ValidateAudience = false,
+                        RequireExpirationTime = false,
+                        ValidateLifetime = true
+                    }; 
+                });
+
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<ChinookContext>();
         }
     }
 }

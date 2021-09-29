@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -15,17 +17,39 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
             List<Artist> artists = await _artistRepository.GetAll();
             var artistApiModels = artists.ConvertAll();
 
+            foreach (var artist in artistApiModels)
+            {
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Artist-", artist.Id), artist, (TimeSpan)cacheEntryOptions);
+            }
+
             return artistApiModels;
         }
 
         public async Task<ArtistApiModel> GetArtistById(int id)
         {
-            var artist = await _artistRepository.GetById(id);
-            if (artist == null) return null;
-            var artistApiModel = artist.Convert();
-            artistApiModel.Albums = (await _albumRepository.GetByArtistId(artist.Id)).ConvertAll().ToList();
+            var artistApiModelCached = _cache.Get<ArtistApiModel>(string.Concat("Artist-", id));
 
-            return artistApiModel;
+            if (artistApiModelCached != null)
+            {
+                return artistApiModelCached;
+            }
+            else
+            {
+                var artist = await _artistRepository.GetById(id);
+                if (artist == null) return null;
+                var artistApiModel = artist.Convert();
+                artistApiModel.Albums = (await _albumRepository.GetByArtistId(artist.Id)).ConvertAll().ToList();
+
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Artist-", artistApiModel.Id), artistApiModel, (TimeSpan)cacheEntryOptions);
+
+                return artistApiModel;
+            }
         }
 
         public async Task<ArtistApiModel> AddArtist(ArtistApiModel newArtistApiModel)

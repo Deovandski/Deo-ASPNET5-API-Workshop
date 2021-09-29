@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -14,29 +17,53 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
             List<Track> tracks = await _trackRepository.GetAll();
             var trackApiModels = tracks.ConvertAll();
 
+            foreach (var track in trackApiModels)
+            {
+                DistributedCacheEntryOptions cacheEntryOptions = new DistributedCacheEntryOptions();
+                cacheEntryOptions.SetSlidingExpiration(TimeSpan.FromSeconds(3600));
+                cacheEntryOptions.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(86400);
+
+                await _distributedCache.SetStringAsync($"Track-{track.Id}", JsonSerializer.Serialize(track), cacheEntryOptions);
+            }
+
             return trackApiModels;
         }
 
         public async Task<TrackApiModel> GetTrackById(int id)
         {
-            var track = await _trackRepository.GetById(id);
-            if (track == null) return null;
-            var trackApiModel = track.Convert();
-            trackApiModel.Genre = await GetGenreById(trackApiModel.GenreId);
-            trackApiModel.Album = await GetAlbumById(trackApiModel.AlbumId);
-            trackApiModel.MediaType = await GetMediaTypeById(trackApiModel.MediaTypeId);
-            if (trackApiModel.Album != null)
-            {
-                trackApiModel.AlbumName = trackApiModel.Album.Title;
-            }
+            var trackApiModelCached = await _distributedCache.GetStringAsync($"Track-{id}");
 
-            trackApiModel.MediaTypeName = trackApiModel.MediaType.Name;
-            if (trackApiModel.Genre != null)
+            if (trackApiModelCached != null)
             {
-                trackApiModel.GenreName = trackApiModel.Genre.Name;
+                return JsonSerializer.Deserialize<TrackApiModel>(trackApiModelCached);
             }
+            else
+            {
+                var track = await _trackRepository.GetById(id);
+                if (track == null) return null;
+                var trackApiModel = track.Convert();
+                trackApiModel.Genre = await GetGenreById(trackApiModel.GenreId);
+                trackApiModel.Album = await GetAlbumById(trackApiModel.AlbumId);
+                trackApiModel.MediaType = await GetMediaTypeById(trackApiModel.MediaTypeId);
+                if (trackApiModel.Album != null)
+                {
+                    trackApiModel.AlbumName = trackApiModel.Album.Title;
+                }
 
-            return trackApiModel;
+                trackApiModel.MediaTypeName = trackApiModel.MediaType.Name;
+                if (trackApiModel.Genre != null)
+                {
+                    trackApiModel.GenreName = trackApiModel.Genre.Name;
+                }
+
+                DistributedCacheEntryOptions cacheEntryOptions = new DistributedCacheEntryOptions();
+                cacheEntryOptions.SetSlidingExpiration(TimeSpan.FromSeconds(3600));
+                cacheEntryOptions.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(86400);
+
+                await _distributedCache.SetStringAsync($"Track-{track.Id}", JsonSerializer.Serialize(trackApiModel), cacheEntryOptions);
+
+                return trackApiModel;
+            }
         }
 
         public async Task<IEnumerable<TrackApiModel>> GetTrackByAlbumId(int id)

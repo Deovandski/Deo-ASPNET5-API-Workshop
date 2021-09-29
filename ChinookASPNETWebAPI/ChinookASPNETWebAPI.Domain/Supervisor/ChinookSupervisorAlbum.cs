@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -15,18 +17,41 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
             List<Album> albums = await _albumRepository.GetAll();
             var albumApiModels = albums.ConvertAll();
 
+            foreach (var album in albumApiModels)
+            {
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Album-", album.Id), album, (TimeSpan)cacheEntryOptions);
+            }
+
             return albumApiModels;
         }
 
         public async Task<AlbumApiModel> GetAlbumById(int id)
         {
-            var album = await _albumRepository.GetById(id);
-            if (album == null) return null;
-            var albumApiModel = album.Convert();
-            albumApiModel.ArtistName = (_artistRepository.GetById(album.ArtistId)).Result.Name;
-            albumApiModel.Tracks = (await GetTrackByAlbumId(id)).ToList();
+            var albumApiModelCached = _cache.Get<AlbumApiModel>(string.Concat("Album-", id));
 
-            return albumApiModel;
+            if (albumApiModelCached != null)
+            {
+                return albumApiModelCached;
+            }
+            else
+            {
+
+                var album = await _albumRepository.GetById(id);
+                if (album == null) return null;
+                var albumApiModel = album.Convert();
+                albumApiModel.ArtistName = (_artistRepository.GetById(album.ArtistId)).Result.Name;
+                albumApiModel.Tracks = (await GetTrackByAlbumId(id)).ToList();
+
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Album-", albumApiModel.Id), albumApiModel, (TimeSpan)cacheEntryOptions);
+
+                return albumApiModel;
+            }
         }
 
         public async Task<IEnumerable<AlbumApiModel>> GetAlbumByArtistId(int id)

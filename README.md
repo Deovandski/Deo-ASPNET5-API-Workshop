@@ -79,11 +79,17 @@ Database Scaffold from migrations/EF. Need to be aware of indexes, and other inn
 
 Code On Demand... Metadata for callback links. The actual name for the process to return 201 on inserts.
 
-Caching Data vs Reliability. Not really an issue since we go full stateless.
+Caching Data vs Reliability. Not really an issue since we go full stateless. However! There are some stuff that has the opportunity to be cached liek SS#, and STR#
+
+Response Caching... Usefull more on React/Blazor apps sicne the consumer are broswers. Api-to-api calls are useless due to the consumer beign stateless. 
+
+In-memory caching --> See ChinnokSupervisor for Albums. That's gonna be really usefull for GoScheelsStore, and other things. Note that cache's id is unaware of what id type it is so Concat with a hardcoded string is needed.
+
+Best way to go is the SQL Cache due to load balanced servers, but at the same time we could get enough advantage by using in-memory caching
 https://woodruff.dev/aspnet-5-web-api-workshop/Standing%20Up%20an%20ASP.NET%20Core%20Web%20API/caching-data/
 
 
-
+Idendity --> The idea to use IdentityServer4 with jwts are the hueway to go.
 
 Really nice website.
 https://www.connectionstrings.com/

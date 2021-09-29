@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -14,16 +16,38 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
             List<Employee> employees = await _employeeRepository.GetAll();
             var employeeApiModels = employees.ConvertAll();
 
+            foreach (var employee in employeeApiModels)
+            {
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Employee-", employee.Id), employee, (TimeSpan)cacheEntryOptions);
+            }
+
             return employeeApiModels;
         }
 
         public async Task<EmployeeApiModel> GetEmployeeById(int id)
         {
-            var employee = await _employeeRepository.GetById(id);
-            if (employee == null) return null;
-            var employeeApiModel = employee.Convert();
+            var employeeApiModelCached = _cache.Get<EmployeeApiModel>(string.Concat("Employee-", id));
 
-            return employeeApiModel;
+            if (employeeApiModelCached != null)
+            {
+                return employeeApiModelCached;
+            }
+            else
+            {
+                var employee = await _employeeRepository.GetById(id);
+                if (employee == null) return null;
+                var employeeApiModel = employee.Convert();
+
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Employee-", employeeApiModel.Id), employeeApiModel, (TimeSpan)cacheEntryOptions);
+
+                return employeeApiModel;
+            }
         }
 
         public async Task<EmployeeApiModel> GetEmployeeReportsTo(int id)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Entities;
 using ChinookASPNETWebAPI.Domain.Extensions;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ChinookASPNETWebAPI.Domain.Supervisor
 {
@@ -15,26 +17,57 @@ namespace ChinookASPNETWebAPI.Domain.Supervisor
             List<Customer> customers = await _customerRepository.GetAll();
             var customerApiModels = customers.ConvertAll();
 
+            foreach (var customer in customerApiModels)
+            {
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Customer-", customer.Id), customer, (TimeSpan)cacheEntryOptions);
+            }
+
             return customerApiModels;
         }
 
         public async Task<CustomerApiModel> GetCustomerById(int id)
         {
-            var customer = await _customerRepository.GetById(id);
-            if (customer == null) return null;
-            var customerApiModel = customer.Convert();
-            customerApiModel.Invoices = (await GetInvoiceByCustomerId(customerApiModel.Id)).ToList();
-            customerApiModel.SupportRep =
-                await GetEmployeeById(customerApiModel.SupportRepId);
-            customerApiModel.SupportRepName =
-                $"{customerApiModel.SupportRep.LastName}, {customerApiModel.SupportRep.FirstName}";
+            var customerApiModelCached = _cache.Get<CustomerApiModel>(string.Concat("Customer-", id));
 
-            return customerApiModel;
+            if (customerApiModelCached != null)
+            {
+                return customerApiModelCached;
+            }
+            else
+            {
+                var customer = await _customerRepository.GetById(id);
+                if (customer == null) return null;
+                var customerApiModel = customer.Convert();
+                customerApiModel.Invoices = (await GetInvoiceByCustomerId(customerApiModel.Id)).ToList();
+                customerApiModel.SupportRep =
+                    await GetEmployeeById(customerApiModel.SupportRepId);
+                customerApiModel.SupportRepName =
+                    $"{customerApiModel.SupportRep.LastName}, {customerApiModel.SupportRep.FirstName}";
+
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Customer-", customerApiModel.Id), customerApiModel, (TimeSpan)cacheEntryOptions);
+
+                return customerApiModel;
+            }
         }
 
         public async Task<IEnumerable<CustomerApiModel>> GetCustomerBySupportRepId(int id)
         {
             var customers = await _customerRepository.GetBySupportRepId(id);
+
+            foreach (var customer in customers)
+            {
+                var cacheEntryOptions = 
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(604800))
+                        .AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(604800);;
+                _cache.Set(string.Concat("Customer-", customer.Id), customer, (TimeSpan)cacheEntryOptions);
+            }
+
             return customers.ConvertAll();
         }
 
