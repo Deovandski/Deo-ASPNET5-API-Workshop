@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using ChinookASPNETWebAPI.Data.Repositories;
 using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Repositories;
@@ -13,7 +14,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using ChinookASPNETWebAPI.Data.Data;
-using ChinookASPNETWebAPI.Domain.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace ChinookASPNETWebAPI.API.Configurations
 {
@@ -113,5 +118,90 @@ namespace ChinookASPNETWebAPI.API.Configurations
                 .AddEntityFrameworkStores<ChinookContext>();
         }
 
+        public static void AddVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                //options.DefaultApiVersion = new ApiVersion( new DateTime( 2020, 9, 22 ) );
+                //options.DefaultApiVersion =
+                //  new ApiVersion(new DateTime( 2020, 9, 22 ), "LetoII", 1, "Beta");
+                options.ReportApiVersions = true;
+                //options.ApiVersionReader = new HeaderApiVersionReader("api-version");
+            });
+        }
+
+        public static void AddSwaggerServices(this IServiceCollection services)
+        {
+
+            services.AddSwaggerGen();
+            services.ConfigureOptions<ConfigureSwaggerOptions>();
+        }
+
+        public static void AddApiExplorer(this IServiceCollection services)
+        {
+            services.AddVersionedApiExplorer(setup =>
+            {
+                setup.GroupNameFormat = "'v'VVV";
+                setup.SubstituteApiVersionInUrl = true;
+            });
+        }
+    }
+
+    public class ConfigureSwaggerOptions : IConfigureNamedOptions<SwaggerGenOptions>
+    {
+        private readonly IApiVersionDescriptionProvider provider;
+
+        public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
+        {
+            this.provider = provider;
+        }
+
+        public void Configure(SwaggerGenOptions options)
+        {
+            // add swagger document for every API version discovered
+            foreach (var description in provider.ApiVersionDescriptions)
+            {
+                options.SwaggerDoc(
+                    description.GroupName, 
+                    CreateVersionInfo(description));
+                options.EnableAnnotations();
+            }
+        }
+
+        public void Configure(string name, SwaggerGenOptions options)
+        {
+            Configure(options);
+        }
+
+        private OpenApiInfo CreateVersionInfo(ApiVersionDescription description)
+        {
+            var info = new OpenApiInfo()
+            {
+                Version = "v1",
+                Title = "Chinook Music Store API",
+                Description = "A simple example ASP.NET Core Web API",
+                TermsOfService = new Uri("https://example.com/terms"),
+                Contact = new OpenApiContact
+                {
+                    Name = "Chris Woodruff",
+                    Email = string.Empty,
+                    Url = new Uri("https://chriswoodruff.com")
+                },
+                License = new OpenApiLicense
+                {
+                    Name = "Use under MIT",
+                    Url = new Uri("https://opensource.org/licenses/MIT")
+                }
+            };
+
+            if (description.IsDeprecated)
+            {
+                info.Description += " This API version has been deprecated.";
+            }
+
+            return info;
+        }
     }
 }

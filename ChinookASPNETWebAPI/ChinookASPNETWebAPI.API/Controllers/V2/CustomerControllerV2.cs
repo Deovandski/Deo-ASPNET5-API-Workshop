@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,15 +8,14 @@ using ChinookASPNETWebAPI.Domain.ApiModels;
 using ChinookASPNETWebAPI.Domain.Supervisor;
 using FluentValidation;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace ChinookASPNETWebAPI.API.Controllers
+namespace ChinookASPNETWebAPI.API.Controllers.V2
 {
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route( "api/v{version:apiVersion}/[controller]" )]
     [ApiController]
     [EnableCors("CorsPolicy")]
-    [ApiVersion("2.0")]
+    [ApiVersion( "2.0" )]
     public class CustomerController : ControllerBase
     {
         private readonly IChinookSupervisor _chinookSupervisor;
@@ -29,6 +29,7 @@ namespace ChinookASPNETWebAPI.API.Controllers
 
         [HttpGet]
         [Produces("application/json")]
+        [MapToApiVersion("2.0")]
         public async Task<ActionResult<List<CustomerApiModel>>> Get()
         {
             try  
@@ -53,6 +54,7 @@ namespace ChinookASPNETWebAPI.API.Controllers
 
         [HttpGet("{id}", Name = "GetCustomerById")]
         [Produces("application/json")]
+        [MapToApiVersion("2.0")]
         public async Task<ActionResult<CustomerApiModel>> Get(int id)
         {
             try  
@@ -78,6 +80,7 @@ namespace ChinookASPNETWebAPI.API.Controllers
         [HttpPost]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [MapToApiVersion("2.0")]
         public async Task<ActionResult<CustomerApiModel>> Post([FromBody] CustomerApiModel input)
         {
             try  
@@ -106,6 +109,7 @@ namespace ChinookASPNETWebAPI.API.Controllers
         [HttpPut("{id}")]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [MapToApiVersion("2.0")]
         public async Task<ActionResult<CustomerApiModel>> Put(int id, [FromBody] CustomerApiModel input)
         {
             try  
@@ -132,6 +136,7 @@ namespace ChinookASPNETWebAPI.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [MapToApiVersion("2.0")]
         public async Task<ActionResult> Delete(int id)
         {
             try  

@@ -107,6 +107,10 @@ FluentValidation is not bad, but the built-in validation with decorators pattern
 
 Versioning.. Highly argumentative right now. No set standad if querystring, or url path... However! MvC.Versioning package is the way to go once we pick which way to set versioning. Does not work out of the box with swagger, but with some tweaks we can make it work. Example provided use pathing versioning.
 
+Maybe PATCH could be interesting, but our API CRUDs on top of AS400 with PUT seems to be fine as well.
+
+Unit Test vs Integration Test. The provided example has a separation between them, with InMemoryDatabase. I myself prefer seeded Database with Unit Testing through the api level. Not as "Unity" as it should be, but by focusing into the endpoint itself you know all the "units" are playing along in harmony.
+
 ## Bad Habit Notes
 
 Calling Data Access from Controllers. Repositories fix that, so we should be good.
@@ -125,3 +129,6 @@ https://entityframework.net/ef-vs-dapper
 
 
 .NET 6. Min API code.
+
+
+FormatResponses | .xml | .json, etc. Not really important for me.

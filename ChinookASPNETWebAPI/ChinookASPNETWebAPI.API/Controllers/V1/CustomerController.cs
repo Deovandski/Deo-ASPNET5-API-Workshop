@@ -10,12 +10,12 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace ChinookASPNETWebAPI.API.Controllers.V1
+namespace ChinookASPNETWebAPI.API.Controllers
 {
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route( "api/v{version:apiVersion}/[controller]" )]
     [ApiController]
     [EnableCors("CorsPolicy")]
-    [ApiVersion("1.0", Deprecated = true)]
+    [ApiVersion( "1.0", Deprecated = true)]
     public class CustomerController : ControllerBase
     {
         private readonly IChinookSupervisor _chinookSupervisor;

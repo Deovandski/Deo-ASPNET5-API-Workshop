@@ -15,6 +15,7 @@ namespace ChinookASPNETWebAPI.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("CorsPolicy")]
+    [ApiVersion( "1.0" )]
     public class InvoiceLineController : ControllerBase
     {
         private readonly IChinookSupervisor _chinookSupervisor;

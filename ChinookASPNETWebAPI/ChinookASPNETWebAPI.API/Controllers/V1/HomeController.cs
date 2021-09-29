@@ -19,6 +19,7 @@ namespace ChinookASPNETWebAPI.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("CorsPolicy")]
+    [ApiVersion( "1.0" )]
     public class HomeController : ControllerBase
     {
         private readonly ILogger<HomeController> _logger;

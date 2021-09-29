@@ -9,12 +9,15 @@ using FluentValidation;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChinookASPNETWebAPI.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("CorsPolicy")]
+    [ApiVersion( "1.0" )]
     public class TrackController : ControllerBase
     {
         private readonly IChinookSupervisor _chinookSupervisor;
@@ -262,6 +265,34 @@ namespace ChinookASPNETWebAPI.API.Controllers
                 _logger.LogError($"Something went wrong inside the TrackController Get By Genre action: {ex}");  
                 return StatusCode((int)HttpStatusCode.InternalServerError, "Error occurred while executing Get All Tracks for Genre");  
             }
+        }
+
+        [HttpPatch("{id}")]  
+        public async Task<ActionResult<TrackApiModel>> Patch(int id, [FromBody] JsonPatchDocument<TrackApiModel> input)  
+        {  
+            var track = await _chinookSupervisor.GetTrackById(id);  
+  
+            if (track == null)  
+            {  
+                return NotFound();  
+            }  
+  
+            input.ApplyTo(track, ModelState); // Must have Microsoft.AspNetCore.Mvc.NewtonsoftJson installed  
+  
+            if (!ModelState.IsValid)  
+            {  
+                return BadRequest(ModelState);  
+            }
+
+            try  
+            {  
+                await _chinookSupervisor.UpdateTrack(track); //Update in the database
+            }  
+            catch (DbUpdateConcurrencyException)  
+            {  
+                return NotFound(); 
+            }  
+            return Ok(track);  
         }
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ChinookASPNETWebAPI.API.Configurations;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace ChinookASPNETWebAPI.API
 {
@@ -30,22 +30,14 @@ namespace ChinookASPNETWebAPI.API
             services.AddHealthChecks();
             services.AddCaching(Configuration);
             services.AddIdentity(Configuration);
-            services.AddApiVersioning(options =>
-            {
-                options.AssumeDefaultVersionWhenUnspecified = true;
-                options.DefaultApiVersion = new ApiVersion(1, 0);
-                //options.DefaultApiVersion = new ApiVersion( new DateTime( 2020, 9, 22 ) );
-                //options.DefaultApiVersion =
-                //  new ApiVersion(new DateTime( 2020, 9, 22 ), "LetoII", 1, "Beta");
-                options.ReportApiVersions = true;
-                //options.ApiVersionReader = new HeaderApiVersionReader("api-version");
-            });
+            services.AddVersioning();
+            services.AddApiExplorer();
+            services.AddSwaggerServices();
             services.AddControllers();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
         {
             app.UseAuthentication();
 
@@ -53,6 +45,17 @@ namespace ChinookASPNETWebAPI.API
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    options.SwaggerEndpoint(
+                        $"/swagger/{description.GroupName}/swagger.json",
+                        description.GroupName.ToUpperInvariant());
+                }
+            });
 
             app.UseHttpsRedirection();
 
