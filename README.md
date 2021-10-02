@@ -111,6 +111,8 @@ Maybe PATCH could be interesting, but our API CRUDs on top of AS400 with PUT see
 
 Unit Test vs Integration Test. The provided example has a separation between them, with InMemoryDatabase. I myself prefer seeded Database with Unit Testing through the api level. Not as "Unity" as it should be, but by focusing into the endpoint itself you know all the "units" are playing along in harmony.
 
+Middleware I created on NUnit for testing. Checking in the IntegrationTest. This might be better if we fully switch over to InMemoryDB.
+
 ## Bad Habit Notes
 
 Calling Data Access from Controllers. Repositories fix that, so we should be good.
